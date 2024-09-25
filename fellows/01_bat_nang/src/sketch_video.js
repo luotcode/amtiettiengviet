@@ -35,7 +35,9 @@ const poems = [
   "tăng"
 ];
 
+let poemCorpus = [];
 let poemDict = {};
+let cauTrucBtn;
 
 
 function preload() {
@@ -64,11 +66,27 @@ function setup() {
   displaySun.hide();
   displaySun.loop();
 
+  // Pick 7 random words to form the poem corpus
+  shuffle(poems, true);
   for (let i=0; i<poems.length; i++) {
-    poemDict[poems[i]] = 0;
+    poemCorpus.push(`${i}_${poems[int(random(0, 7))]}`);
+  }
+
+  // console.log(poemCorpus)
+
+  for (let i=0; i<poemCorpus.length; i++) {
+    poemDict[poemCorpus[i]] = 0;
   }
 
   textFont("Times New Roman");
+
+  cauTrucBtn = createSelect();
+  cauTrucBtn.position(10, windowHeight-30);
+  cauTrucBtn.option('sẽ _ để _');
+  cauTrucBtn.option('để _ sẽ _');
+  cauTrucBtn.option('để chúng tôi _');
+  cauTrucBtn.selected('sẽ _ để _');
+  cauTrucBtn.changed(function(){baiTho=[]});
 }
 
 function draw() {
@@ -96,8 +114,9 @@ function draw() {
         // noFill();
         // rect(j*gridW, i*gridH, gridW, gridH);
 
-        poemChar = poems[idx/4];
-        poemDict[poemChar] = grayScale;
+        poemCharLookUp = poemCorpus[idx/4]; // return e.g: 34_xanh la
+        poemChar = poemCharLookUp.split("_")[1];
+        poemDict[poemCharLookUp] = grayScale; // update the word's grayscale
 
         if (grayScale>200) {
           stroke(200);
@@ -118,18 +137,26 @@ function draw() {
     }
   }
 
+  let c = cauTrucBtn.selected();
+
   if (baiTho.length == 0) {
-    isMode1 = !isMode1;
-    if (isMode1) {
+    if (c == "sẽ _ để _") {
       baiTho = placeholder1();
-    } else {
+    } else if (c == "để _ sẽ _") {
       baiTho = placeholder2();
-    }
+    } else if (c == "để chúng tôi _") {
+      baiTho = placeholder3();
+    } 
+    // isMode1 = !isMode1;
+    // if (isMode1) {
+    //   baiTho = placeholder3();
+    // } else {
+    //   baiTho = placeholder3();
+    // }
   }
   
   if (frameCount % (3*60) == 0) {
       // chuyển từ obj dict sang ary của các cặp key-value
-      // Convert the dictionary to an array of key-value pairs
       const sortedArray = Object.entries(poemDict)
       .sort(([, value1], [, value2]) => value2 - value1) // Lựa value theo thứ tự giảm dần
       .slice(0, 5); // chọn 5 cái lớn nhất
@@ -137,17 +164,20 @@ function draw() {
       // chuyển top 5 elements trở lại thành object
       const top5Dict = Object.fromEntries(sortedArray);
       let top5Words = Object.keys(top5Dict);
+      shuffle(top5Words, true);
       // console.log(top5Dict);
 
+      // Chon mot cau tho trong placeholder
       cauThoMau = baiTho.shift()
       soChu = int(cauThoMau.split(" ")[0])
       cauThoMau = cauThoMau.split(" ").slice(1).join(" ");
       
+      // Lam tho
       for (let r=0; r<soChu; r++) {
-        cauThoMau = cauThoMau.replace(`${r}`, top5Words[r])
+        cauThoMau = cauThoMau.replace(`${r}`, top5Words[r].split("_")[1])
       } 
       
-      // Lam tho
+      // Hien thi tho tren console
       console.log(cauThoMau);
   }
   
@@ -170,6 +200,8 @@ function mousePressed() {
    playing = !playing;
  }
 
+
+// Cấu trúc 1: ___ chúng tôi sẽ ____ để
 function placeholder1() {
     let baiTho = [];
     baiTho.push("2 chúng tôi sẽ 0 để 1")
@@ -189,6 +221,8 @@ function placeholder1() {
     return baiTho
 }
 
+
+// Cấu trúc 2: ____ để chúng tôi sẽ _____
 function placeholder2() {
     let baiTho = [];
     baiTho.push("2 để 0 chúng tôi sẽ 1")
@@ -205,5 +239,15 @@ function placeholder2() {
       baiTho.push(dongTho);
     }
 
+    return baiTho
+}
+
+// Cấu trúc 3: Để chúng tôi _______
+function placeholder3() {
+    let baiTho = [];
+    baiTho.push("1 để chúng tôi 0");
+    for (let i=0; i<6; i++) {
+      baiTho.push("1 để chúng tôi 0");
+    }
     return baiTho
 }
