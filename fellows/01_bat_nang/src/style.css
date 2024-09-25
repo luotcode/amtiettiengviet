@@ -4,5 +4,6 @@ html, body {
   }
   canvas {
     display: block;
+    margin-top: 15vh;
   }
   

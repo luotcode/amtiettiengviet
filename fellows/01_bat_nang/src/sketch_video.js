@@ -39,9 +39,8 @@ let poemDict = {};
 
 
 function preload() {
-  sun = createVideo("assets/hẻm dưới cầu tham lương.mp4");
-  displaySun = createVideo("assets/hẻm dưới cầu tham lương.mp4");
-  // sun = loadImage("/assets/Sun (1).png");
+  sun = createVideo("assets/video.mp4");
+  displaySun = createVideo("assets/video.mp4");
 }
 
 function setup() {
@@ -53,8 +52,7 @@ function setup() {
   
   // Calculate display window
   displayH = displayW / vidRatio;
-  // console.log(displayH);
-  createCanvas(displayW, displayH);
+  createCanvas(displayW, displayH).elt.getContext('2d', { willReadFrequently: true });
 
   // Calculate grid
   gridW = width / numCols;
@@ -70,13 +68,11 @@ function setup() {
     poemDict[poems[i]] = 0;
   }
 
-  // console.log(gridW, gridH);
+  textFont("Times New Roman");
 }
 
 function draw() {
-  // background(10);
   image(displaySun, 0, 0, width, height);
-  // image(sun, 0, 0, width, height);
 
   // load Pixels
   sun.loadPixels();
@@ -96,36 +92,33 @@ function draw() {
         // Tinh trung binh
         let grayScale = (r+g+b)/3;
         
-        fill(grayScale);
-        textSize(9);
-        textAlign(CENTER, CENTER);
-        // text(int(grayScale), j*gridW, i*gridH, gridW, gridH);
+        // Ke grid
+        // noFill();
+        // rect(j*gridW, i*gridH, gridW, gridH);
 
-        stroke(200);
-        strokeWeight(0.1);
-        noFill();
-        rect(j*gridW, i*gridH, gridW, gridH);
+        poemChar = poems[idx/4];
+        poemDict[poemChar] = grayScale;
 
         if (grayScale>200) {
           stroke(200);
           strokeWeight(0.1);
           fill(255, 255, 0, 50);
-
           rect(j*gridW, i*gridH, gridW, gridH);
-        } 
-    
-        poemChar = poems[idx/4];
-        poemDict[poemChar] = grayScale;
-        textSize(8);
-        textAlign(CENTER, CENTER);
-        fill(0);
-        stroke(0)
-        text(poemChar, j*gridW + gridW/2, i*gridH+gridH/2)
+
+          textSize(12);
+          textAlign(CENTER, CENTER);
+          fill(0);
+          text(poemChar, j*gridW + gridW/2, i*gridH+gridH/2)
+        } else {
+          textSize(11);
+          textAlign(CENTER, CENTER);
+          fill(150);
+          text(poemChar, j*gridW + gridW/2, i*gridH+gridH/2)
+        }
     }
   }
 
   if (baiTho.length == 0) {
-    // baiTho = placeholder1();
     isMode1 = !isMode1;
     if (isMode1) {
       baiTho = placeholder1();
@@ -144,7 +137,7 @@ function draw() {
       // chuyển top 5 elements trở lại thành object
       const top5Dict = Object.fromEntries(sortedArray);
       let top5Words = Object.keys(top5Dict);
-      console.log(top5Dict);
+      // console.log(top5Dict);
 
       cauThoMau = baiTho.shift()
       soChu = int(cauThoMau.split(" ")[0])
@@ -154,9 +147,8 @@ function draw() {
         cauThoMau = cauThoMau.replace(`${r}`, top5Words[r])
       } 
       
+      // Lam tho
       console.log(cauThoMau);
-      console.log(baiTho);
-      console.log(isMode1);
   }
   
 }
@@ -177,11 +169,6 @@ function mousePressed() {
    }
    playing = !playing;
  }
-
-// function createPlaceholder(isMode1) {
-//   baiTho = placeholder1();
-//   return baiTho;
-// }
 
 function placeholder1() {
     let baiTho = [];

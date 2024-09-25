@@ -41,9 +41,6 @@ let poemDict = {};
 function preload() {
   sun = createCapture(VIDEO);
   displaySun = createCapture(VIDEO);
-  // sun = createVideo("assets/hẻm dưới cầu tham lương.mp4");
-  // displaySun = createVideo("assets/hẻm dưới cầu tham lương.mp4");
-  // sun = loadImage("/assets/Sun (1).png");
 }
 
 function setup() {
@@ -56,7 +53,7 @@ function setup() {
   // Calculate display window
   displayH = displayW / vidRatio;
   // console.log(displayH);
-  createCanvas(displayW, displayH);
+  createCanvas(displayW, displayH).elt.getContext('2d', { willReadFrequently: true });
 
   // Calculate grid
   gridW = width / numCols;
@@ -72,13 +69,11 @@ function setup() {
     poemDict[poems[i]] = 0;
   }
 
-  // console.log(gridW, gridH);
+  textFont("Times New Roman");
 }
 
 function draw() {
-  // background(10);
   image(displaySun, 0, 0, width, height);
-  // image(sun, 0, 0, width, height);
 
   // load Pixels
   sun.loadPixels();
@@ -98,31 +93,27 @@ function draw() {
         // Tinh trung binh
         let grayScale = (r+g+b)/3;
         
-        fill(grayScale);
-        textSize(9);
-        textAlign(CENTER, CENTER);
-        // text(int(grayScale), j*gridW, i*gridH, gridW, gridH);
-
-        stroke(200);
-        strokeWeight(0.1);
-        noFill();
-        rect(j*gridW, i*gridH, gridW, gridH);
+        poemChar = poems[idx/4];
+        poemDict[poemChar] = grayScale;
 
         if (grayScale>200) {
           stroke(200);
           strokeWeight(0.1);
           fill(255, 255, 0, 50);
-
           rect(j*gridW, i*gridH, gridW, gridH);
-        } 
-    
-        poemChar = poems[idx/4];
-        poemDict[poemChar] = grayScale;
-        textSize(8);
-        textAlign(CENTER, CENTER);
-        fill(0);
-        stroke(0)
-        text(poemChar, j*gridW + gridW/2, i*gridH+gridH/2)
+
+          // Highlight cac chu duoc chon
+          textSize(11);
+          textAlign(CENTER, CENTER);
+          fill(0);
+          text(poemChar, j*gridW + gridW/2, i*gridH+gridH/2)
+        } else {
+          // Cac chu con lai trong grid
+          textSize(11);
+          textAlign(CENTER, CENTER);
+          fill(150);
+          text(poemChar, j*gridW + gridW/2, i*gridH+gridH/2)
+        }
     }
   }
 
