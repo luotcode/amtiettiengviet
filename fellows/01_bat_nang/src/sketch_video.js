@@ -38,6 +38,7 @@ const poems = [
 let poemCorpus = [];
 let poemDict = {};
 let cauTrucBtn;
+let countCauTruc = -1;
 
 
 function preload() {
@@ -66,13 +67,12 @@ function setup() {
   displaySun.hide();
   displaySun.loop();
 
-  // Pick 7 random words to form the poem corpus
+  // Từ nguồn chữ ban đầu, chọn ra 7 chữ ngẫu nhiên
+  // Để dùng làm thơ
   shuffle(poems, true);
   for (let i=0; i<poems.length; i++) {
     poemCorpus.push(`${i}_${poems[int(random(0, 7))]}`);
   }
-
-  // console.log(poemCorpus)
 
   for (let i=0; i<poemCorpus.length; i++) {
     poemDict[poemCorpus[i]] = 0;
@@ -80,13 +80,13 @@ function setup() {
 
   textFont("Times New Roman");
 
-  cauTrucBtn = createSelect();
-  cauTrucBtn.position(10, windowHeight-30);
-  cauTrucBtn.option('sẽ _ để _');
-  cauTrucBtn.option('để _ sẽ _');
-  cauTrucBtn.option('để chúng tôi _');
-  cauTrucBtn.selected('sẽ _ để _');
-  cauTrucBtn.changed(function(){baiTho=[]});
+  // cauTrucBtn = createSelect();
+  // cauTrucBtn.position(10, windowHeight-30);
+  // cauTrucBtn.option('sẽ _ để _');
+  // cauTrucBtn.option('để _ sẽ _');
+  // cauTrucBtn.option('để chúng tôi _');
+  // cauTrucBtn.selected('sẽ _ để _');
+  // cauTrucBtn.changed(function(){baiTho=[]});
 }
 
 function draw() {
@@ -137,47 +137,45 @@ function draw() {
     }
   }
 
-  let c = cauTrucBtn.selected();
+  // let c = cauTrucBtn.selected();
 
+  // Tạo một bài thơ mới mỗi khi hết bài thơ cũ
   if (baiTho.length == 0) {
-    if (c == "sẽ _ để _") {
+    countCauTruc+=1
+    if (countCauTruc%3==0) {
       baiTho = placeholder1();
-    } else if (c == "để _ sẽ _") {
+    } else if (countCauTruc%3==1) {
       baiTho = placeholder2();
-    } else if (c == "để chúng tôi _") {
+    } else if (countCauTruc%3==2) {
       baiTho = placeholder3();
     } 
-    // isMode1 = !isMode1;
-    // if (isMode1) {
-    //   baiTho = placeholder3();
-    // } else {
-    //   baiTho = placeholder3();
-    // }
   }
   
+  // làm thơ mỗi 3 giây (1 sec = 60 frames)
   if (frameCount % (3*60) == 0) {
-      // chuyển từ obj dict sang ary của các cặp key-value
+      // Thông số độ sáng các ô được lưu dưới dạng dictionary (key-value)
+      // Vdu: {"bất khả kháng": 50}
+      // Truy cập và lấy 5 ô có độ sáng lớn nhất
       const sortedArray = Object.entries(poemDict)
-      .sort(([, value1], [, value2]) => value2 - value1) // Lựa value theo thứ tự giảm dần
-      .slice(0, 5); // chọn 5 cái lớn nhất
+      .sort(([, value1], [, value2]) => value2 - value1) 
+      .slice(0, 5); 
 
-      // chuyển top 5 elements trở lại thành object
+      // Mỗi ô tương ứng một chữ. Tạo array của 5 chữ đó
       const top5Dict = Object.fromEntries(sortedArray);
       let top5Words = Object.keys(top5Dict);
       shuffle(top5Words, true);
-      // console.log(top5Dict);
 
-      // Chon mot cau tho trong placeholder
+      // Chọn lấy câu thơ placeholder tiếp theo
       cauThoMau = baiTho.shift()
+      // Lấy thông tin số ô trống cần điền
       soChu = int(cauThoMau.split(" ")[0])
       cauThoMau = cauThoMau.split(" ").slice(1).join(" ");
-      
-      // Lam tho
+      // Làm thơ: đi qua từng ô trống 
+      // Thay số thứ tự chỗ trống (0, 1, 2, ...) bằng các chữ. 
       for (let r=0; r<soChu; r++) {
         cauThoMau = cauThoMau.replace(`${r}`, top5Words[r].split("_")[1])
       } 
-      
-      // Hien thi tho tren console
+      // Hiển thị bài thơ trên console
       console.log(cauThoMau);
   }
   
@@ -201,20 +199,28 @@ function mousePressed() {
  }
 
 
-// Cấu trúc 1: ___ chúng tôi sẽ ____ để
+// Cấu trúc 1: ___ sẽ ____ để
 function placeholder1() {
+    // tạo array trống để lưu thơ
     let baiTho = [];
+    // câu đầu tiên có 2 chỗ trống: chúng tôi sẽ _ để _ 
+    // 0, 1 tương ứng với thứ tự chỗ trống
     baiTho.push("2 chúng tôi sẽ 0 để 1")
+    // tạo 6 câu trống tiếp theo 
     for (let i=0; i<6; i++) {
+      // xác định xem bài thơ có bao nhiêu chỗ trống
       soChu = int(random(1, 6));
       dongTho = `${soChu} `
       for (let j=0; j<soChu; j++) {
+        // các chỗ trống vị trí chẵn đi cùng vế "sẽ _"
+        // các chỗ trống vị trí lẻ đi cùng vế "để _"
         if (j%2==0) {
           dongTho += `sẽ ${j} `
         } else {
           dongTho += `để ${j} `
         }
       }
+      // thêm câu thơ vào array
       baiTho.push(dongTho);
     }
 
@@ -222,20 +228,28 @@ function placeholder1() {
 }
 
 
-// Cấu trúc 2: ____ để chúng tôi sẽ _____
+// Cấu trúc 2: để _____ sẽ _____
 function placeholder2() {
+    // tạo array trống để lưu thơ
     let baiTho = [];
+    // câu đầu tiên có 2 chỗ trống, để _ chúng tôi sẽ _
+    // 0, 1 tương ứng với thứ tự chỗ trống
     baiTho.push("2 để 0 chúng tôi sẽ 1")
+    // tạo 6 câu trống tiếp theo 
     for (let i=0; i<6; i++) {
+      // xác định xem bài thơ có bao nhiêu chỗ trống
       soChu = int(random(1, 6));
       dongTho = `${soChu} `
       for (let j=0; j<soChu; j++) {
+        // các chỗ trống vị trí chẵn đi cùng vế "để _"
+        // các chỗ trống vị trí lẻ đi cùng vế "sẽ _"
         if (j%2!=0) {
           dongTho += `sẽ ${j} `
         } else {
           dongTho += `để ${j} `
         }
       }
+      // thêm câu thơ vào array
       baiTho.push(dongTho);
     }
 
@@ -245,6 +259,8 @@ function placeholder2() {
 // Cấu trúc 3: Để chúng tôi _______
 function placeholder3() {
     let baiTho = [];
+    // Mỗi câu chỉ có 1 chỗ trống duy nhất
+    // chỗ trống ở vị trí 0
     baiTho.push("1 để chúng tôi 0");
     for (let i=0; i<6; i++) {
       baiTho.push("1 để chúng tôi 0");
