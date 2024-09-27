@@ -15,7 +15,6 @@ let gridH;
 
 let playing = false;
 let baiTho = [];
-let isMode1 = true;
 
 const poems = [
   "ngóng", "tiếc nuối", "thống khổ", "bức xúc", "đau đáu", "ngao ngán", "ngột ngạt", "mơ",
