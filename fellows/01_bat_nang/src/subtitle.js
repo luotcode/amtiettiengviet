@@ -54,11 +54,11 @@ function setup() {
 
     // Calculate display window
     displayH = displayW / vidRatio;
-    createCanvas(displayW, displayH);
+    createCanvas(displayW, displayH+100);
 
     // Calculate grid
     gridW = width / numCols;
-    gridH = height / numRows;
+    gridH = (height-100) / numRows;
 
     sun.hide();
     sun.loop();
@@ -90,7 +90,7 @@ function setup() {
 
 function draw() {
     background(0);
-    image(displaySun, 0, 0, width, height);
+    image(displaySun, 0, 0, width, height-100);
 
     // load Pixels
     sun.loadPixels();
@@ -183,7 +183,7 @@ function draw() {
     stroke(255);
     textSize(30);
     fill(255);
-    text(cauThoMau, width/ 2, height-40);
+    text(cauThoMau, width/ 2, height-50);
     pop();
 
 }
